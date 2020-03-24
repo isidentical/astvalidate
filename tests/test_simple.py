@@ -2,7 +2,7 @@ import ast
 
 import pytest
 
-from astvalidate.simple import SimpleASTValidator
+from astvalidate.validators.simple import SimpleASTValidator
 
 
 @pytest.mark.parametrize(
@@ -52,4 +52,3 @@ def test_simple_ast_validator(node):
     with pytest.raises(SyntaxError) as cm:
         validator.validate(ast.fix_missing_locations(node))
     assert cm.value.node is node
-    print(cm.value)

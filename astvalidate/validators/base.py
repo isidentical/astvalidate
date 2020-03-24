@@ -39,7 +39,7 @@ class ASTValidator(ast.NodeVisitor):
                 if clear:
                     del children.parent
                 else:
-                    children.parent = weakref.ref(parent)
+                    children.parent = parent
 
     def closest_positional_node(self, node):
         if not hasattr(node, "parent"):
@@ -61,5 +61,8 @@ class ASTValidator(ast.NodeVisitor):
 
 
 class AsyncAwareASTValidator(ASTValidator):
+    def __init__(self, top_level_await=False):
+        self.top_level_await = top_level_await
+
     def __getattr__(self, attribute):
         raise AttributeError(attribute)

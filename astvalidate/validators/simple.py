@@ -1,6 +1,8 @@
 import ast
 
-from astvalidate.validator import ASTValidator, name_of
+from astvalidate.validators.base import ASTValidator, name_of
+
+LEVEL = 1
 
 CONSTANT_TYPES = frozenset((int, float, complex, bool, str, bytes))
 CONSTANT_SEQUENCE_TYPES = frozenset((tuple, frozenset))

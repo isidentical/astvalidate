@@ -1,13 +1,33 @@
-from astvalidate.simple import SimpleASTValidator
+import importlib
+import pkgutil
 
-VALIDATORS = [SimpleASTValidator()]
+import astvalidate.validators
+
+IGNORE = -1
 
 
-def validate(tree, level=1):
-    if not 0 <= level <= len(VALIDATORS):
-        raise ValueError("Level should be in range of 0..{len(VALIDATORS)}")
+def discover_validators(level):
+    validators = []
+    for module_information in pkgutil.iter_modules(
+        astvalidate.validators.__path__
+    ):
+        module = importlib.import_module(
+            f"astvalidate.validators.{module_information.name}"
+        )
+        if hasattr(module, "level") and (
+            module.level <= level or level == IGNORE
+        ):
+            validators.append(
+                getattr(
+                    module, f"{module_information.name.title()}ASTValidator"
+                )()
+            )
 
-    for validator in VALIDATORS[:level]:
+    return []
+
+
+def validate(tree, level=IGNORE):
+    for validator in discover_validators(level):
         validator.validate(tree)
 
     return True
