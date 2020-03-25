@@ -36,7 +36,7 @@ class ASTValidator(ast.NodeVisitor):
     def set_parents(self, tree, *, clear=False):
         for parent in ast.walk(tree):
             for children in ast.iter_child_nodes(parent):
-                if clear:
+                if clear and hasattr(children, "parent"):
                     del children.parent
                 else:
                     children.parent = parent

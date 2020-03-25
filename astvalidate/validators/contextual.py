@@ -1,4 +1,5 @@
 import ast
+import struct
 
 from astvalidate.context import (
     Contexts,
@@ -8,9 +9,35 @@ from astvalidate.context import (
 from astvalidate.validators.base import AsyncAwareASTValidator, name_of
 
 LEVEL = 2
+INT_MAX = 2 ** (struct.calcsize("i") * 8 - 1) - 1
 
 
 class ContextualASTValidator(AsyncAwareASTValidator):
+    def validate_yield(self, node):
+        context = context_of(node)
+        if not context & Contexts.FUNCTION:
+            self.invalidate(
+                f"{name_of(node)} should be placed inside of a function", node
+            )
+
+    def validate_assignment(self, node):
+        seen_star = False
+        for index, target in enumerate(node.targets):
+            if isinstance(target, ast.Starred) and not seen_star:
+                if index >= (1 << 8) or len(node.targets) - index - 1 >= (
+                    INT_MAX >> 8
+                ):
+                    self.invalidate(
+                        f"Too many expressions used with star unpacking with {name_of(node)}",
+                        node,
+                    )
+                seen_star = True
+            elif isinstance(target, ast.Starred) and seen_star:
+                self.invalidate(
+                    f"More then one starred expressions can't be placed together in {name_of(node)}",
+                    node,
+                )
+
     def validate_control_flow(self, node):
         if not does_appear_in_parent_chain(
             node, (ast.For, ast.AsyncFor, ast.While)
@@ -60,6 +87,25 @@ class ContextualASTValidator(AsyncAwareASTValidator):
                     "'from __future__' import must occur at the top of file",
                     node,
                 )
+
+    def visit_comprehension(self, node):
+        if node.is_async:
+            self.validate_async_statement(node)
+
+    def visit_YieldFrom(self, node):
+        self.validate_yield(node)
+        if context_of(node) & Contexts.COROUTINE:
+            self.invalidate(
+                f"{name_of(node)} can't be used in a coroutine", node
+            )
+
+    def visit_Await(self, node):
+        self.validate_yield(node)
+        self.validate_async_statement(node)
+
+    visit_Yield = validate_yield
+
+    visit_Assign = validate_assignment
 
     visit_Break = validate_control_flow
     visit_Continue = validate_control_flow

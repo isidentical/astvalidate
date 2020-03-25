@@ -5,7 +5,7 @@ import pytest
 
 import astvalidate
 
-VALID_FILES = Path(__file__).parent / "data" / "valid"
+VALID_FILES = Path(astvalidate.__path__[0])
 
 
 @pytest.mark.parametrize("file", VALID_FILES.glob("**/*.py"))
