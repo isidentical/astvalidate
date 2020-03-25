@@ -12,8 +12,12 @@ LEVEL = 2
 
 class ScopeDeclarations(Flag):
     NONE = auto()
+    LOCAL = auto()
     GLOBAL = auto()
     NONLOCAL = auto()
+
+
+ANY_SCOPE = ScopeDeclarations.GLOBAL | ScopeDeclarations.NONLOCAL
 
 
 @dataclass
@@ -33,7 +37,17 @@ class SymbolicASTValidator(ContextAwareASTValidator):
 
     def set_scope(self, node, scope):
         for name in node.names:
+            if self.context.names[name] & ScopeDeclarations.LOCAL:
+                self.invalidate(
+                    f"'{name}' can't be used before the global/nonlocal declaration",
+                    node,
+                )
             self.context.names[name] |= scope
+
+    def visit_Name(self, node):
+        name = node.id
+        if self.context.names[name] is ScopeDeclarations.NONE:
+            self.context.names[name] = ScopeDeclarations.LOCAL
 
     visit_Global = partialmethod(set_scope, scope=ScopeDeclarations.GLOBAL)
     visit_Nonlocal = partialmethod(set_scope, scope=ScopeDeclarations.NONLOCAL)
@@ -60,12 +74,11 @@ class SymbolicASTValidator(ContextAwareASTValidator):
     def visit_AnnAssign(self, node):
         if isinstance(node.target, ast.Name):
             target = node.target.id
-            if self.context.names[target] & (ScopeDeclarations.GLOBAL | ScopeDeclarations.NONLOCAL):
+            if self.context.names[target] & ANY_SCOPE:
                 self.invalidate(
                     f"Annotated name '{target}' can't be used with global/nonlocal",
-                    node
+                    node,
                 )
-
 
     def validate_ste(self, ste):
         for name, scope in ste.names.items():

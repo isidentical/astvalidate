@@ -36,8 +36,16 @@ from astvalidate.validators.symbolic import SymbolicASTValidator
                 global f
                 f: int = 3
             """,
-            "'f' can't be used with global/nonlocal"
-        )
+            "'f' can't be used with global/nonlocal",
+        ),
+        (
+            """
+            def x(a):
+                f
+                global f
+            """,
+            "'f' can't be used before the global/nonlocal",
+        ),
     ],
 )
 def test_simple_ast_validator(source, message):
