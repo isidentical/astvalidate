@@ -46,6 +46,13 @@ from astvalidate.validators.symbolic import SymbolicASTValidator
             """,
             "'f' can't be used before the global/nonlocal",
         ),
+        (
+            """
+            def x(a):
+                from f import *
+            """,
+            "Star import can only be used at the module level",
+        ),
     ],
 )
 def test_simple_ast_validator(source, message):

@@ -80,6 +80,14 @@ class SymbolicASTValidator(ContextAwareASTValidator):
                     node,
                 )
 
+    def visit_ImportFrom(self, node):
+        if not isinstance(self.context.node, ast.Module) and any(
+            alias.name == "*" for alias in node.names
+        ):
+            self.invalidate(
+                f"Star import can only be used at the module level", node
+            )
+
     def validate_ste(self, ste):
         for name, scope in ste.names.items():
             if (
