@@ -30,6 +30,14 @@ from astvalidate.validators.symbolic import SymbolicASTValidator
             """,
             "'a' is duplicated",
         ),
+        (
+            """
+            def x(a):
+                global f
+                f: int = 3
+            """,
+            "'f' can't be used with global/nonlocal"
+        )
     ],
 )
 def test_simple_ast_validator(source, message):

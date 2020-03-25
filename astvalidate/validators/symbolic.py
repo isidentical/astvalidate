@@ -57,6 +57,16 @@ class SymbolicASTValidator(ContextAwareASTValidator):
                 )
             seen.add(arg.arg)
 
+    def visit_AnnAssign(self, node):
+        if isinstance(node.target, ast.Name):
+            target = node.target.id
+            if self.context.names[target] & (ScopeDeclarations.GLOBAL | ScopeDeclarations.NONLOCAL):
+                self.invalidate(
+                    f"Annotated name '{target}' can't be used with global/nonlocal",
+                    node
+                )
+
+
     def validate_ste(self, ste):
         for name, scope in ste.names.items():
             if (
