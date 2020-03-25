@@ -17,7 +17,7 @@ from astvalidate.validators.contextual import ContextualASTValidator
         (ast.Break(), "inside of a loop"),
         (ast.AsyncFor(), "inside of a coroutine"),
         (
-            ast.Try(handlers=[ast.ExceptHandler(), ast.ExceptHandler(type=1)]),
+            ast.Try(handlers=[ast.ExceptHandler(type=None), ast.ExceptHandler(type=1)]),
             "must be placed last",
         ),
         (
