@@ -41,7 +41,7 @@ jobs:
         python${{ matrix.python }} -m pytest -c /dev/null
 
     - name: Publish
-      if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+      if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') && matrix.python == '3.9'
       uses: pypa/gh-action-pypi-publish@master
       with:
         user: __token__
