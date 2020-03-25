@@ -1,3 +1,5 @@
+import __future__
+
 import ast
 import struct
 
@@ -78,8 +80,8 @@ class ContextualASTValidator(AsyncAwareASTValidator):
                 )
 
     def visit_ImportFrom(self, node):
-        if node.module == "__future__" and node.parent.body.index(node) != 0:
-            if not (
+        if node.module == "__future__":
+            if node.parent.body.index(node) != 0 and not (
                 isinstance(node.parent.body[-1], ast.Constant)
                 and isinstance(node.parent.body[-1].value, str)
             ):
@@ -87,6 +89,12 @@ class ContextualASTValidator(AsyncAwareASTValidator):
                     "'from __future__' import must occur at the top of file",
                     node,
                 )
+
+            for future in node.names:
+                if future.name not in __future__.all_feature_names:
+                    self.invalidate(
+                        f"Future feature '{future.name}' is not defined", node
+                    )
 
     def visit_comprehension(self, node):
         if node.is_async:

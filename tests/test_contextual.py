@@ -25,6 +25,12 @@ from astvalidate.validators.contextual import ContextualASTValidator
             "must occur at the top",
         ),
         (
+            ast.Module(
+                [ast.ImportFrom("__future__", names=[ast.alias(name="lol")])]
+            ),
+            "'lol' is not defined",
+        ),
+        (
             ast.Assign(targets=[ast.Starred(), ast.Starred()]),
             "More then one starred expression",
         ),
