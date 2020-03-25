@@ -32,9 +32,17 @@ jobs:
 
     - name: Build
       run: |
+        python${{ matrix.python }} setup.py sdist
         python${{ matrix.python }} -m pip install -e .
         python${{ matrix.python }} -m pip install -r requirements-dev.txt
 
     - name: Test
       run: |
         python${{ matrix.python }} -m pytest -c /dev/null
+
+    - name: Publish
+      if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.pypi_token }}
