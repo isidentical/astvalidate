@@ -14,20 +14,20 @@ def discover_validators(level):
         module = importlib.import_module(
             f"astvalidate.validators.{module_information.name}"
         )
-        if hasattr(module, "level") and (
-            module.level <= level or level == IGNORE
+        if hasattr(module, "LEVEL") and (
+            module.LEVEL <= level or level == IGNORE
         ):
             validators.append(
                 getattr(
                     module, f"{module_information.name.title()}ASTValidator"
-                )()
+                )
             )
 
-    return []
+    return validators
 
 
 def validate(tree, level=IGNORE):
     for validator in discover_validators(level):
-        validator.validate(tree)
+        validator().validate(tree)
 
     return True

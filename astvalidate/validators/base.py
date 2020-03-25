@@ -20,6 +20,8 @@ class ASTValidator(ast.NodeVisitor):
             return self.visit(tree)
         finally:
             self.set_parents(tree, clear=True)
+            if hasattr(self, "finalize"):
+                self.finalize()
 
     def invalidate(self, message, node):
         if hasattr(node, "lineno"):
@@ -66,3 +68,32 @@ class AsyncAwareASTValidator(ASTValidator):
 
     def __getattr__(self, attribute):
         raise AttributeError(attribute)
+
+
+class ContextAwareASTValidator(ASTValidator):
+    def __init__(self):
+        self.contexts = []
+
+    def enter_context(self, node):
+        self.contexts.append(node)
+
+    def exit_context(self, node):
+        self.contexts.pop()
+
+    @property
+    def context(self):
+        return self.contexts[-1]
+
+    def visit(self, node):
+        context_change = isinstance(
+            node,
+            (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef),
+        )
+        if context_change:
+            self.enter_context(node)
+        super().visit(node)
+        if context_change:
+            self.exit_context(node)
+
+    def finalize(self):
+        self.contexts.clear()

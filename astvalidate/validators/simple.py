@@ -143,7 +143,6 @@ class SimpleASTValidator(ASTValidator):
     visit_For = validate_statement
     visit_While = validate_statement
 
-    visit_Del = validate_names
     visit_Global = validate_names
     visit_Import = validate_names
 

@@ -14,7 +14,9 @@ def context_of(node):
     context = Contexts.GLOBAL
     parent = node
     while parent is not None:
-        if isinstance(parent, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        if isinstance(
+            parent, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)
+        ):
             context = Contexts.FUNCTION
             if isinstance(parent, ast.AsyncFunctionDef):
                 context |= Contexts.COROUTINE
@@ -36,6 +38,6 @@ def context_of(node):
 
 def does_appear_in_parent_chain(node, wanted):
     parent = node
-    while parent and not isinstance(node, wanted):
-        parent = getattr(node, "parent", False)
+    while parent and not isinstance(parent, wanted):
+        parent = getattr(parent, "parent", False)
     return parent
