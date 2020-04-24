@@ -1,5 +1,6 @@
 import ast
 import copy
+import warnings
 import weakref
 from contextlib import contextmanager
 
@@ -23,17 +24,22 @@ class ASTValidator(ast.NodeVisitor):
             if hasattr(self, "finalize"):
                 self.finalize()
 
-    def invalidate(self, message, node):
+    def infer_position(self, node):
         if hasattr(node, "lineno"):
-            lineno, col_offset = node.lineno, node.col_offset
+            return node.lineno, node.col_offset
         elif parent := self.closest_positional_node(node):
-            lineno, col_offset = parent.lineno, parent.col_offset
+            return parent.lineno, parent.col_offset
         else:
-            lineno, col_offset = -1, -1
+            return -1, -1
 
-        error = SyntaxError(message, (None, lineno, col_offset, None))
+    def invalidate(self, message, node):
+        error = SyntaxError(message, (None, *self.infer_position(node), None))
         error.node = node
         raise error
+
+    def warn(self, message, node):
+        lineno, _ = self.infer_position(node)
+        warnings.warn_explicit(message, SyntaxWarning, "<astvalidate>", lineno)
 
     def set_parents(self, tree, *, clear=False):
         for parent in ast.walk(tree):
