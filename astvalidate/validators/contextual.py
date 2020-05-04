@@ -10,7 +10,7 @@ from astvalidate.context import (
 )
 from astvalidate.validators.base import AsyncAwareASTValidator, name_of
 
-LEVEL = 2
+LEVEL = 3
 INT_MAX = 2 ** (struct.calcsize("i") * 8 - 1) - 1
 
 
