@@ -44,22 +44,18 @@ class SyntaticalASTValidator(ASTValidator):
                 f"perhaps you missed a comma?",
                 node,
             )
-        if not (
+        if isinstance(
+            node.value,
             (
-                isinstance(node.slice, ast.Constant)
-                and isinstance(node.slice.value, int)
-            )
-            or isinstance(node.slice, ast.Slice)
+                ast.Tuple,
+                ast.List,
+                ast.ListComp,
+                ast.JoinedStr,
+                ast.FormattedValue,
+            ),
         ):
-            if isinstance(
-                node.value,
-                (
-                    ast.Tuple,
-                    ast.List,
-                    ast.ListComp,
-                    ast.JoinedStr,
-                    ast.FormattedValue,
-                ),
+            if isinstance(node.slice, ast.Constant) and not isinstance(
+                node.slice.value, int
             ):
                 self.warn(
                     f"{name_of(node.value)} indices must be integers or slices, "

@@ -2,7 +2,7 @@ import ast
 import tokenize
 from argparse import ArgumentParser
 
-from astvalidate import IGNORE, validate
+from astvalidate import validate
 
 
 def main():
@@ -10,7 +10,7 @@ def main():
         description="Validate the integrity of python files"
     )
     parser.add_argument("file")
-    parser.add_argument("--level", type=int, default=IGNORE)
+    parser.add_argument("--level", type=int, default=None)
 
     options = parser.parse_args()
     with tokenize.open(options.file) as f:

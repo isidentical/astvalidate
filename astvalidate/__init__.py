@@ -3,10 +3,8 @@ import pkgutil
 
 import astvalidate.validators
 
-IGNORE = -1
 
-
-def discover_validators(level):
+def discover_validators(level=None):
     validators = []
     for module_information in pkgutil.iter_modules(
         astvalidate.validators.__path__
@@ -15,7 +13,7 @@ def discover_validators(level):
             f"astvalidate.validators.{module_information.name}"
         )
         if hasattr(module, "LEVEL") and (
-            module.LEVEL <= level or level == IGNORE
+            level is None or module.LEVEL <= level
         ):
             validators.append(
                 getattr(
@@ -26,8 +24,8 @@ def discover_validators(level):
     return validators
 
 
-def validate(tree, level=IGNORE):
+def validate(tree, level=None):
     for validator in discover_validators(level):
         validator().validate(tree)
-
-    return True
+    else:
+        return True

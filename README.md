@@ -3,11 +3,11 @@
 A series of AST validators for validating the integrity of the tree.
 
 ## Interface
-The stable interface is `validate`, which comes directly from the root of
-the package. It takes the tree, and the validation level. Validation level
-specifies the strictness degree; for an example if it is 1, tree will be only
-checked by some basic checks that is similiar to `PyAST_Validate` interface in
-`Python/ast.c`. Increasing levels means increasing checks and strictness.
+The stable interface is `validate(tree: AST, level: Optional[int] = None) -> bool`,
+which comes directly from the root of the package. It takes the tree, and optionally the
+validation level. Validation level specifies the strictness degree; for an example if it
+is 1, tree will be only checked by some basic checks that is similiar to `PyAST_Validate`
+interface  in `Python/ast.c`. Increasing levels means increasing checks and strictness.
 
 ```py
 import ast

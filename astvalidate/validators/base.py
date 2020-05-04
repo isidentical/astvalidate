@@ -3,10 +3,17 @@ import copy
 import warnings
 import weakref
 from contextlib import contextmanager
+from functools import partialmethod
 
 
 def name_of(value):
     return type(value).__name__
+
+
+def _original_getattr(self, attribute):
+    raise AttributeError(
+        f"'{type(self).__name__}' object has no attribute '{attribute}'"
+    )
 
 
 class ASTValidator(ast.NodeVisitor):
@@ -65,15 +72,14 @@ class ASTValidator(ast.NodeVisitor):
         if attribute.startswith("Async"):
             real_node = attribute[len("Async") :]
             return getattr(self, real_node)
-        raise AttributeError(attribute)
+        raise _original_getattr(self, attribute)
 
 
 class AsyncAwareASTValidator(ASTValidator):
     def __init__(self, top_level_await=False):
         self.top_level_await = top_level_await
 
-    def __getattr__(self, attribute):
-        raise AttributeError(attribute)
+    __getattr__ = partialmethod(_original_getattr)
 
 
 class ContextAwareASTValidator(ASTValidator):
