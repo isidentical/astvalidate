@@ -2,13 +2,13 @@ import ast
 
 from astvalidate.validators.base import ASTValidator, name_of
 
-LEVEL = 1
-
 CONSTANT_TYPES = frozenset((int, float, complex, bool, str, bytes))
 CONSTANT_SEQUENCE_TYPES = frozenset((tuple, frozenset))
 
 
 class SimpleASTValidator(ASTValidator):
+    LEVEL = 1
+
     def validate_body(self, node):
         if len(node.body) < 1:
             self.invalidate(

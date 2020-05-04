@@ -10,11 +10,12 @@ from astvalidate.context import (
 )
 from astvalidate.validators.base import AsyncAwareASTValidator, name_of
 
-LEVEL = 3
 INT_MAX = 2 ** (struct.calcsize("i") * 8 - 1) - 1
 
 
 class ContextualASTValidator(AsyncAwareASTValidator):
+    LEVEL = 3
+
     def validate_yield(self, node):
         context = context_of(node)
         if not context & Contexts.FUNCTION:

@@ -2,30 +2,46 @@ import importlib
 import pkgutil
 
 import astvalidate.validators
+from astvalidate.validators.base import ASTValidator
 
+VALIDATOR_PKG = "astvalidate.validators"
 
-def discover_validators(level=None):
+def is_validator(subject):
+    return (
+        isinstance(subject, type)
+        and issubclass(subject, ASTValidator)
+        and hasattr(subject, "LEVEL")
+    )
+
+def static_validators(level=None):
     validators = []
     for module_information in pkgutil.iter_modules(
         astvalidate.validators.__path__
     ):
-        module = importlib.import_module(
-            f"astvalidate.validators.{module_information.name}"
-        )
-        if hasattr(module, "LEVEL") and (
-            level is None or module.LEVEL <= level
-        ):
-            validators.append(
-                getattr(
-                    module, f"{module_information.name.title()}ASTValidator"
-                )
-            )
+        module_name = f"{VALIDATOR_PKG}.{module_information.name}"
+        module = importlib.import_module(module_name)
+        for subject in vars(module).values():
+            if (
+                is_validator(subject)
+                and subject.__module__ == module_name
+            ):
+                if level is None or subject.LEVEL <= level:
+                    validators.append(subject)
 
     return validators
 
 
+def dynamic_validators(level=None):
+    validators = []
+    for validator in ASTValidator.__subclasses__():
+        if validator.__module__.startswith(VALIDATOR_PKG) or not is_validator(validator):
+            continue
+        validators.append(validator)
+    return validators
+
+
 def validate(tree, level=None):
-    for validator in discover_validators(level):
+    for validator in (*static_validators(level), *dynamic_validators(level)):
+        print(validator)
         validator().validate(tree)
-    else:
-        return True
+    return True

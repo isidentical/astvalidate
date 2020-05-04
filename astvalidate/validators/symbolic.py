@@ -7,8 +7,6 @@ from typing import DefaultDict
 
 from astvalidate.validators.base import ContextAwareASTValidator, name_of
 
-LEVEL = 2
-
 
 class ScopeDeclarations(Flag):
     NONE = auto()
@@ -29,6 +27,8 @@ class STE:
 
 
 class SymbolicASTValidator(ContextAwareASTValidator):
+    LEVEL = 2
+
     def enter_context(self, node):
         self.contexts.append(STE(node))
 

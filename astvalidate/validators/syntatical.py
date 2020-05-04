@@ -2,10 +2,10 @@ import ast
 
 from astvalidate.validators.base import ASTValidator, name_of
 
-LEVEL = 1
-
 
 class SyntaticalASTValidator(ASTValidator):
+    LEVEL = 1
+
     def visit_Assert(self, node):
         if isinstance(node.test, ast.Tuple) and len(node.test.elts) > 0:
             self.warn(
