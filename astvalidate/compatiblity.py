@@ -3,6 +3,7 @@ import sys
 
 PY39_PLUS = sys.version_info >= (3, 9)
 
+
 def slice_value(value, /):
     if PY39_PLUS or isinstance(value, ast.Slice):
         return value

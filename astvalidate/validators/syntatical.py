@@ -3,6 +3,7 @@ import ast
 from astvalidate.compatiblity import slice_value
 from astvalidate.validators.base import ASTValidator, name_of
 
+
 class SyntaticalASTValidator(ASTValidator):
     LEVEL = 1
 
@@ -55,7 +56,9 @@ class SyntaticalASTValidator(ASTValidator):
             ),
         ):
             slice_t = slice_value(node.slice)
-            if isinstance(slice_t, ast.Constant) and not isinstance(slice_t.value, int):
+            if isinstance(slice_t, ast.Constant) and not isinstance(
+                slice_t.value, int
+            ):
                 self.warn(
                     f"{name_of(node.value)} indices must be integers or slices, "
                     f"not {name_of(node.slice)} perhaps you missed a comma?",

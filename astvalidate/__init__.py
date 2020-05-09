@@ -6,12 +6,14 @@ from astvalidate.validators.base import ASTValidator
 
 VALIDATOR_PKG = "astvalidate.validators"
 
+
 def is_validator(subject):
     return (
         isinstance(subject, type)
         and issubclass(subject, ASTValidator)
         and hasattr(subject, "LEVEL")
     )
+
 
 def static_validators(level=None):
     validators = []
@@ -21,10 +23,7 @@ def static_validators(level=None):
         module_name = f"{VALIDATOR_PKG}.{module_information.name}"
         module = importlib.import_module(module_name)
         for subject in vars(module).values():
-            if (
-                is_validator(subject)
-                and subject.__module__ == module_name
-            ):
+            if is_validator(subject) and subject.__module__ == module_name:
                 if level is None or subject.LEVEL <= level:
                     validators.append(subject)
 
@@ -34,7 +33,9 @@ def static_validators(level=None):
 def dynamic_validators(level=None):
     validators = []
     for validator in ASTValidator.__subclasses__():
-        if validator.__module__.startswith(VALIDATOR_PKG) or not is_validator(validator):
+        if validator.__module__.startswith(VALIDATOR_PKG) or not is_validator(
+            validator
+        ):
             continue
         validators.append(validator)
     return validators
