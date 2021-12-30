@@ -1,6 +1,6 @@
 import ast
 
-from astvalidate.compatiblity import slice_value
+from astvalidate.compatibility import slice_value
 from astvalidate.validators.base import ASTValidator, name_of
 
 
@@ -10,7 +10,8 @@ class SyntaticalASTValidator(ASTValidator):
     def visit_Assert(self, node):
         if isinstance(node.test, ast.Tuple) and len(node.test.elts) > 0:
             self.warn(
-                "Assertion is always true, perhaps remove parentheses?", node,
+                "Assertion is always true, perhaps remove parentheses?",
+                node,
             )
 
     def visit_Call(self, node):

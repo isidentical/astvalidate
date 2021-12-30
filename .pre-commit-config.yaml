@@ -14,3 +14,14 @@ repos:
     rev: v5.9.3
     hooks:
     -   id: isort
+-   repo: https://github.com/codespell-project/codespell
+    rev: v2.1.0
+    hooks:
+    -   id: codespell
+-   repo: https://github.com/executablebooks/mdformat/
+    rev: 0.7.11
+    hooks:
+    -   id: mdformat
+        additional_dependencies:
+        - mdformat-black
+        - mdformat_tables

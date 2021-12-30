@@ -43,6 +43,5 @@ def dynamic_validators(level=None):
 
 def validate(tree, level=None):
     for validator in (*static_validators(level), *dynamic_validators(level)):
-        print(validator)
         validator().validate(tree)
     return True
