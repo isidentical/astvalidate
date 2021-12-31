@@ -17,6 +17,10 @@ def _original_getattr(self, attribute):
 
 
 class ASTValidator(ast.NodeVisitor):
+    def __init__(self, fail_fast=True):
+        self.problems = []
+        self.fail_fast = fail_fast
+
     def visit(self, node):
         super().visit(node)
         if hasattr(self, f"visit_{name_of(node)}"):
@@ -25,11 +29,13 @@ class ASTValidator(ast.NodeVisitor):
     def validate(self, tree):
         self.set_parents(tree)
         try:
-            return self.visit(tree)
+            self.visit(tree)
         finally:
             self.set_parents(tree, clear=True)
             if hasattr(self, "finalize"):
                 self.finalize()
+
+        return self.problems
 
     def infer_position(self, node):
         if hasattr(node, "lineno"):
@@ -42,11 +48,20 @@ class ASTValidator(ast.NodeVisitor):
     def invalidate(self, message, node):
         error = SyntaxError(message, (None, *self.infer_position(node), None))
         error.node = node
-        raise error
+        self.problems.append(error)
+        if self.fail_fast:
+            raise error
 
     def warn(self, message, node):
         lineno, _ = self.infer_position(node)
-        warnings.warn_explicit(message, SyntaxWarning, "<astvalidate>", lineno)
+        if self.fail_fast:
+            warnings.warn_explicit(
+                message, SyntaxWarning, "<astvalidate>", lineno
+            )
+        else:
+            self.problems.append(
+                SyntaxWarning(message, "<astvalidate>", lineno)
+            )
 
     def set_parents(self, tree, *, clear=False):
         for parent in ast.walk(tree):
@@ -76,14 +91,16 @@ class ASTValidator(ast.NodeVisitor):
 
 
 class AsyncAwareASTValidator(ASTValidator):
-    def __init__(self, top_level_await=False):
+    def __init__(self, *args, top_level_await=False, **kwargs):
+        super().__init__(*args, **kwargs)
         self.top_level_await = top_level_await
 
     __getattr__ = partialmethod(_original_getattr)
 
 
 class ContextAwareASTValidator(ASTValidator):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.contexts = []
 
     def enter_context(self, node):
