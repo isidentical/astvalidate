@@ -15,10 +15,10 @@ def browse(paths):
 
 
 def validate_single(path, level):
-    with tokenize.open(path) as f:
-        source = f.read()
-    tree = ast.parse(source)
-    return validate(tree, level=level)
+    with tokenize.open(path) as stream:
+        tree = ast.parse(stream.read())
+
+    return validate(tree, level=level, fail_fast=False)
 
 
 def main():
@@ -30,9 +30,12 @@ def main():
 
     options = parser.parse_args()
     for path in browse(options.paths):
-        validate_single(path, options.level)
-    else:
-        print("No problems found!")
+        try:
+            status = validate_single(path, options.level)
+        except Exception as exc:
+            print("~", str(path), "(" + str(exc) + ")")
+
+        print("✅" if status else "❌", str(path))
 
 
 if __name__ == "__main__":
