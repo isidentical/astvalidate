@@ -4,7 +4,7 @@ A series of AST validators for validating the integrity of the given abstract sy
 
 ## API
 
-`validate(tree: ast.Module, level: Optional[Literal[1, 2, 3]] = None) -> bool`
+`validate(tree: ast.Module, level: Optional[Literal[1, 2, 3]] = None) -> Literal[True]`
 
 `tree` is the AST object that you want to verify. `level` is an argument to pass the
 level of strictness, and turn on/off some of the validators. For a detailed list of validators,
