@@ -1,8 +1,5 @@
 import ast
-import copy
 import warnings
-import weakref
-from contextlib import contextmanager
 from functools import partialmethod
 
 

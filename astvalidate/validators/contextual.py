@@ -31,13 +31,15 @@ class ContextualASTValidator(AsyncAwareASTValidator):
                     INT_MAX >> 8
                 ):
                     self.invalidate(
-                        f"Too many expressions used with star unpacking with {name_of(node)}",
+                        "Too many expressions used with star unpacking with"
+                        f" {name_of(node)}",
                         node,
                     )
                 seen_star = True
             elif isinstance(target, ast.Starred) and seen_star:
                 self.invalidate(
-                    f"More then one starred expressions can't be placed together in {name_of(node)}",
+                    "More then one starred expressions can't be placed"
+                    f" together in {name_of(node)}",
                     node,
                 )
 

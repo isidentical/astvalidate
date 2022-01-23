@@ -33,7 +33,7 @@ class SyntaticalASTValidator(ASTValidator):
         ):
             self.warn(
                 f"{name_of(node.func)} object is not callable;"
-                f"perhaps you missed a comma?",
+                "perhaps you missed a comma?",
                 node,
             )
 
@@ -43,7 +43,7 @@ class SyntaticalASTValidator(ASTValidator):
         ):
             self.warn(
                 f"{name_of(node.value)} object is not subscriptable;"
-                f"perhaps you missed a comma?",
+                "perhaps you missed a comma?",
                 node,
             )
         if isinstance(
@@ -61,7 +61,8 @@ class SyntaticalASTValidator(ASTValidator):
                 slice_t.value, int
             ):
                 self.warn(
-                    f"{name_of(node.value)} indices must be integers or slices, "
-                    f"not {name_of(node.slice)} perhaps you missed a comma?",
+                    f"{name_of(node.value)} indices must be integers or"
+                    f" slices, not {name_of(node.slice)} perhaps you missed a"
+                    " comma?",
                     node,
                 )

@@ -41,20 +41,23 @@ class SimpleASTValidator(ASTValidator):
     def visit_arguments(self, node):
         if len(node.defaults) > len(node.posonlyargs) + len(node.args):
             self.invalidate(
-                f"More positional defaults than args on {name_of(node)}'s arguments",
+                f"More positional defaults than args on {name_of(node)}'s"
+                " arguments",
                 node,
             )
 
         if len(node.kw_defaults) != len(node.kwonlyargs):
             self.invalidate(
-                f"Length of kwonlyargs is not the same as kw_defaults on {name_of(node)}'s arguments",
+                "Length of kwonlyargs is not the same as kw_defaults on"
+                f" {name_of(node)}'s arguments",
                 node,
             )
 
     def visit_AnnAssign(self, node):
         if node.simple and not isinstance(node.target, ast.Name):
             self.invalidate(
-                f"Simple {name_of(node)} was expecting a Name node but found {name_of(node.target)}",
+                f"Simple {name_of(node)} was expecting a Name node but found"
+                f" {name_of(node.target)}",
                 node,
             )
 
@@ -67,7 +70,8 @@ class SimpleASTValidator(ASTValidator):
     def visit_Raise(self, node):
         if node.exc is None and node.cause is not None:
             self.invalidate(
-                f"{name_of(node)}'s cause can't be used without setting an exception",
+                f"{name_of(node)}'s cause can't be used without setting an"
+                " exception",
                 node,
             )
 
@@ -75,12 +79,14 @@ class SimpleASTValidator(ASTValidator):
         self.validate_body(node)
         if len(node.handlers) + len(node.finalbody) < 1:
             self.invalidate(
-                f"{name_of(node)} should have at least one of these: a handler or a finally clause",
+                f"{name_of(node)} should have at least one of these: a handler"
+                " or a finally clause",
                 node,
             )
         if len(node.handlers) == 0 and len(node.orelse) != 0:
             self.invalidate(
-                f"{name_of(node)} has an else clause but not an exception handler",
+                f"{name_of(node)} has an else clause but not an exception"
+                " handler",
                 node,
             )
 
@@ -112,7 +118,8 @@ class SimpleASTValidator(ASTValidator):
             )
         if len(node.comparators) != len(node.ops):
             self.invalidate(
-                f"{name_of(node)} doesn't have same amount of comparator and operands",
+                f"{name_of(node)} doesn't have same amount of comparator and"
+                " operands",
                 node,
             )
 
@@ -126,7 +133,8 @@ class SimpleASTValidator(ASTValidator):
                 return all(is_constant(item) for item in value)
             else:
                 self.invalidate(
-                    f"Non-constant value ({name_of(value)}) encountered inside of a {name_of(node)}",
+                    f"Non-constant value ({name_of(value)}) encountered inside"
+                    f" of a {name_of(node)}",
                     node,
                 )
 

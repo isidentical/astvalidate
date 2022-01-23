@@ -1,7 +1,5 @@
 import ast
 
-import pytest
-
 import astvalidate
 
 PROBLEMATIC_SOURCE = """

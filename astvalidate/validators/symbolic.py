@@ -5,7 +5,7 @@ from enum import Flag, auto
 from functools import partial, partialmethod
 from typing import DefaultDict
 
-from astvalidate.validators.base import ContextAwareASTValidator, name_of
+from astvalidate.validators.base import ContextAwareASTValidator
 
 
 class ScopeDeclarations(Flag):
@@ -39,7 +39,8 @@ class SymbolicASTValidator(ContextAwareASTValidator):
         for name in node.names:
             if self.context.names[name] & ScopeDeclarations.LOCAL:
                 self.invalidate(
-                    f"'{name}' can't be used before the global/nonlocal declaration",
+                    f"'{name}' can't be used before the global/nonlocal"
+                    " declaration",
                     node,
                 )
             self.context.names[name] |= scope
@@ -76,7 +77,8 @@ class SymbolicASTValidator(ContextAwareASTValidator):
             target = node.target.id
             if self.context.names[target] & ANY_SCOPE:
                 self.invalidate(
-                    f"Annotated name '{target}' can't be used with global/nonlocal",
+                    f"Annotated name '{target}' can't be used with"
+                    " global/nonlocal",
                     node,
                 )
 
